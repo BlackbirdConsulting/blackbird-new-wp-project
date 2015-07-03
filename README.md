@@ -1,5 +1,7 @@
 # Blackbird Consulting WordPress
-This is [Blackbird Consulting's](www.blackbirdconsult.com) base WordPress installation for use on all new projects. This git repository contains two additonal submodules that pull in the most current [WordPress](https://github.com/WordPress/WordPress) installation and [WP-Sync-DB](https://github.com/wp-sync-db/wp-sync-db), a custom plugin that assists with database migration.
+This is [Blackbird Consulting's](www.blackbirdconsult.com) base WordPress installation for use on all new projects. This git repository contains [WordPress](https://github.com/WordPress/WordPress) within it as a "fake" submodule, as demonstrated in [this post](http://debuggable.com/posts/git-fake-submodules:4b563ee4-f3cc-4061-967e-0e48cbdd56cb). In order to get a fresh version of WordPress from its own repo, simply ```cd wordpress```and perform a ```git pull```. 
+
+Two plugins are also included, [WP-Sync-DB](https://github.com/wp-sync-db/wp-sync-db), a custom plugin that assists with database migration, and [Github-Updater](https://github.com/afragen/github-updater). WP-Sync-DB is not located in the main WordPress plugin repo, it is located on GitHub. Therefore, in order to update WP-Sync-DB, GitHub-Updater must also be installed.
 
 ## ```wp-content``` *outside* ```wordpress``` directory
 
@@ -115,6 +117,13 @@ The ```wp-config.php``` file in this repository has been changed enable two data
     # Remember to use recursive to include all submodules
 
 #Changelog
-Apple has a formalised version number structure based around the NumVersion struct, which specifies a one- or two-digit major version, a one-digit minor version, a one-digit "bug" (i.e. revision) version,
+Apple has a formalised version number structure based around the NumVersion struct, which specifies a one- or two-digit major version, a one-digit minor version, a one-digit "bug" (i.e. revision) version.
+
+##0.1.0
+- removed submodules, replaced with "fake" submodule for wordpress
+- wp-sync-db added outside submodule framework. Will now be updated via GitHub-Updater
+- github-updater added
+
 ##0.0.1
-- still very much in development mode
+- constructed repo with wp-content outside of primary wordpress directory
+- wordpress and wp-sync-db added as submodules
