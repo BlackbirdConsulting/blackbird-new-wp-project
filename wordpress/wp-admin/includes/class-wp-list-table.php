@@ -1,65 +1,71 @@
 <?php
 /**
+ * Administration API: WP_List_Table class
+ *
+ * @package WordPress
+ * @subpackage List_Table
+ * @since 3.1.0
+ */
+
+/**
  * Base class for displaying a list of items in an ajaxified HTML table.
  *
  * @since 3.1.0
  * @access private
- *
- * @package WordPress
- * @subpackage List_Table
  */
 class WP_List_Table {
 
 	/**
-	 * The current list of items
+	 * The current list of items.
 	 *
 	 * @since 3.1.0
-	 * @var array
 	 * @access public
+	 * @var array
 	 */
 	public $items;
 
 	/**
-	 * Various information about the current table
+	 * Various information about the current table.
 	 *
 	 * @since 3.1.0
-	 * @var array
 	 * @access protected
+	 * @var array
 	 */
 	protected $_args;
 
 	/**
-	 * Various information needed for displaying the pagination
+	 * Various information needed for displaying the pagination.
 	 *
 	 * @since 3.1.0
+	 * @access protected
 	 * @var array
 	 */
 	protected $_pagination_args = array();
 
 	/**
-	 * The current screen
+	 * The current screen.
 	 *
 	 * @since 3.1.0
-	 * @var object
 	 * @access protected
+	 * @var object
 	 */
 	protected $screen;
 
 	/**
-	 * Cached bulk actions
+	 * Cached bulk actions.
 	 *
 	 * @since 3.1.0
-	 * @var array
 	 * @access private
+	 * @var array
 	 */
 	private $_actions;
 
 	/**
-	 * Cached pagination output
+	 * Cached pagination output.
 	 *
 	 * @since 3.1.0
-	 * @var string
 	 * @access private
+	 * @var string
 	 */
 	private $_pagination;
 
@@ -67,20 +73,34 @@ class WP_List_Table {
 	 * The view switcher modes.
 	 *
 	 * @since 4.1.0
-	 * @var array
 	 * @access protected
+	 * @var array
 	 */
 	protected $modes = array();
 
 	/**
-	 * Stores the value returned by ->get_column_info()
+	 * Stores the value returned by ->get_column_info().
 	 *
+	 * @since 4.1.0
+	 * @access protected
 	 * @var array
 	 */
 	protected $_column_headers;
 
+	/**
+	 * {@internal Missing Summary}
+	 *
+	 * @access protected
+	 * @var array
+	 */
 	protected $compat_fields = array( '_args', '_pagination_args', 'screen', '_actions', '_pagination' );
 
+	/**
+	 * {@internal Missing Summary}
+	 *
+	 * @access protected
+	 * @var array
+	 */
 	protected $compat_methods = array( 'set_pagination_args', 'get_views', 'get_bulk_actions', 'bulk_actions',
 		'row_actions', 'months_dropdown', 'view_switcher', 'comments_bubble', 'get_items_per_page', 'pagination',
 		'get_sortable_columns', 'get_column_info', 'get_table_classes', 'display_tablenav', 'extra_tablenav',
@@ -248,10 +268,10 @@ class WP_List_Table {
 	/**
 	 * An internal method that sets all the necessary pagination arguments
 	 *
-	 * @param array $args An associative array with information about the pagination
+	 * @since 3.1.0
 	 * @access protected
 	 *
-	 * @param array|string $args
+	 * @param array|string $args Array or string of arguments with information about the pagination.
 	 */
 	protected function set_pagination_args( $args ) {
 		$args = wp_parse_args( $args, array(
@@ -283,11 +303,13 @@ class WP_List_Table {
 	 * @return int Number of items that correspond to the given pagination argument.
 	 */
 	public function get_pagination_arg( $key ) {
-		if ( 'page' == $key )
+		if ( 'page' === $key ) {
 			return $this->get_pagenum();
+		}
 
-		if ( isset( $this->_pagination_args[$key] ) )
+		if ( isset( $this->_pagination_args[$key] ) ) {
 			return $this->_pagination_args[$key];
+		}
 	}
 
 	/**
@@ -380,6 +402,8 @@ class WP_List_Table {
 		if ( empty( $views ) )
 			return;
 
+		$this->screen->render_screen_reader_content( 'heading_views' );
+
 		echo "<ul class='subsubsub'>\n";
 		foreach ( $views as $class => $view ) {
 			$views[ $class ] = "\t<li class='$class'>$view";
@@ -435,14 +459,14 @@ class WP_List_Table {
 		if ( empty( $this->_actions ) )
 			return;
 
-		echo "<label for='bulk-action-selector-" . esc_attr( $which ) . "' class='screen-reader-text'>" . __( 'Select bulk action' ) . "</label>";
-		echo "<select name='action$two' id='bulk-action-selector-" . esc_attr( $which ) . "'>\n";
-		echo "<option value='-1' selected='selected'>" . __( 'Bulk Actions' ) . "</option>\n";
+		echo '<label for="bulk-action-selector-' . esc_attr( $which ) . '" class="screen-reader-text">' . __( 'Select bulk action' ) . '</label>';
+		echo '<select name="action' . $two . '" id="bulk-action-selector-' . esc_attr( $which ) . "\">\n";
+		echo '<option value="-1">' . __( 'Bulk Actions' ) . "</option>\n";
 
 		foreach ( $this->_actions as $name => $title ) {
-			$class = 'edit' == $name ? ' class="hide-if-no-js"' : '';
+			$class = 'edit' === $name ? ' class="hide-if-no-js"' : '';
 
-			echo "\t<option value='$name'$class>$title</option>\n";
+			echo "\t" . '<option value="' . $name . '"' . $class . '>' . $title . "</option>\n";
 		}
 
 		echo "</select>\n";
@@ -528,10 +552,18 @@ class WP_List_Table {
 			return;
 		}
 
+		$extra_checks = "AND post_status != 'auto-draft'";
+		if ( ! isset( $_GET['post_status'] ) || 'trash' !== $_GET['post_status'] ) {
+			$extra_checks .= " AND post_status != 'trash'";
+		} elseif ( isset( $_GET['post_status'] ) ) {
+			$extra_checks = $wpdb->prepare( ' AND post_status = %s', $_GET['post_status'] );
+		}
+
 		$months = $wpdb->get_results( $wpdb->prepare( "
 			SELECT DISTINCT YEAR( post_date ) AS year, MONTH( post_date ) AS month
 			FROM $wpdb->posts
 			WHERE post_type = %s
+			$extra_checks
 			ORDER BY post_date DESC
 		", $post_type ) );
 
@@ -590,7 +622,7 @@ class WP_List_Table {
 <?php
 			foreach ( $this->modes as $mode => $title ) {
 				$classes = array( 'view-' . $mode );
-				if ( $current_mode == $mode )
+				if ( $current_mode === $mode )
 					$classes[] = 'current';
 				printf(
 					"<a href='%s' class='%s' id='view-switch-$mode'><span class='screen-reader-text'>%s</span></a>\n",
@@ -614,15 +646,46 @@ class WP_List_Table {
 	 * @param int $pending_comments Number of pending comments.
 	 */
 	protected function comments_bubble( $post_id, $pending_comments ) {
-		$pending_phrase = sprintf( __( '%s pending' ), number_format( $pending_comments ) );
+		$approved_comments = get_comments_number();
 
-		if ( $pending_comments )
-			echo '<strong>';
+		$approved_comments_number = number_format_i18n( $approved_comments );
+		$pending_comments_number = number_format_i18n( $pending_comments );
 
-		echo "<a href='" . esc_url( add_query_arg( 'p', $post_id, admin_url( 'edit-comments.php' ) ) ) . "' title='" . esc_attr( $pending_phrase ) . "' class='post-com-count'><span class='comment-count'>" . number_format_i18n( get_comments_number() ) . "</span></a>";
+		$approved_only_phrase = sprintf( _n( '%s comment', '%s comments', $approved_comments ), $approved_comments_number );
+		$approved_phrase = sprintf( _n( '%s approved comment', '%s approved comments', $approved_comments ), $approved_comments_number );
+		$pending_phrase = sprintf( _n( '%s pending comment', '%s pending comments', $pending_comments ), $pending_comments_number );
 
-		if ( $pending_comments )
-			echo '</strong>';
+		// No comments at all.
+		if ( ! $approved_comments && ! $pending_comments ) {
+			printf( '<span aria-hidden="true">—</span><span class="screen-reader-text">%s</span>',
+				__( 'No comments' )
+			);
+		// Approved comments have different display depending on some conditions.
+		} elseif ( $approved_comments ) {
+			printf( '<a href="%s" class="post-com-count post-com-count-approved"><span class="comment-count-approved" aria-hidden="true">%s</span><span class="screen-reader-text">%s</span></a>',
+				esc_url( add_query_arg( array( 'p' => $post_id, 'comment_status' => 'approved' ), admin_url( 'edit-comments.php' ) ) ),
+				$approved_comments_number,
+				$pending_comments ? $approved_phrase : $approved_only_phrase
+			);
+		} else {
+			printf( '<span class="post-com-count post-com-count-no-comments"><span class="comment-count comment-count-no-comments" aria-hidden="true">%s</span><span class="screen-reader-text">%s</span></span>',
+				$approved_comments_number,
+				$pending_comments ? __( 'No approved comments' ) : __( 'No comments' )
+			);
+		}
+
+		if ( $pending_comments ) {
+			printf( '<a href="%s" class="post-com-count post-com-count-pending"><span class="comment-count-pending" aria-hidden="true">%s</span><span class="screen-reader-text">%s</span></a>',
+				esc_url( add_query_arg( array( 'p' => $post_id, 'comment_status' => 'moderated' ), admin_url( 'edit-comments.php' ) ) ),
+				$pending_comments_number,
+				$pending_phrase
+			);
+		} else {
+			printf( '<span class="post-com-count post-com-count-pending post-com-count-no-pending"><span class="comment-count comment-count-no-pending" aria-hidden="true">%s</span><span class="screen-reader-text">%s</span></span>',
+				$pending_comments_number,
+				$approved_comments ? __( 'No pending comments' ) : __( 'No comments' )
+			);
+		}
 	}
 
 	/**
@@ -693,6 +756,10 @@ class WP_List_Table {
 			$infinite_scroll = $this->_pagination_args['infinite_scroll'];
 		}
 
+		if ( 'top' === $which && $total_pages > 1 ) {
+			$this->screen->render_screen_reader_content( 'heading_pagination' );
+		}
+
 		$output = '<span class="displaying-num">' . sprintf( _n( '%s item', '%s items', $total_items ), number_format_i18n( $total_items ) ) . '</span>';
 
 		$current = $this->get_pagenum();
@@ -743,7 +810,7 @@ class WP_List_Table {
 			);
 		}
 
-		if ( 'bottom' == $which ) {
+		if ( 'bottom' === $which ) {
 			$html_current_page  = $current;
 			$total_pages_before = '<span class="screen-reader-text">' . __( 'Current Page' ) . '</span><span id="table-paging" class="paging-input">';
 		} else {
@@ -824,7 +891,7 @@ class WP_List_Table {
 	}
 
 	/**
-	 * Get the name of the default primary column.
+	 * Gets the name of the default primary column.
 	 *
 	 * @since 4.3.0
 	 * @access protected
@@ -832,11 +899,41 @@ class WP_List_Table {
 	 * @return string Name of the default primary column, in this case, an empty string.
 	 */
 	protected function get_default_primary_column_name() {
-		return '';
+		$columns = $this->get_columns();
+		$column = '';
+
+		if ( empty( $columns ) ) {
+			return $column;
+		}
+
+		// We need a primary defined so responsive views show something,
+		// so let's fall back to the first non-checkbox column.
+		foreach ( $columns as $col => $column_name ) {
+			if ( 'cb' === $col ) {
+				continue;
+			}
+
+			$column = $col;
+			break;
+		}
+
+		return $column;
 	}
 
 	/**
-	 * Get the name of the primary column.
+	 * Public wrapper for WP_List_Table::get_default_primary_column_name().
+	 *
+	 * @since 4.4.0
+	 * @access public
+	 *
+	 * @return string Name of the default primary column.
+	 */
+	public function get_primary_column() {
+		return $this->get_primary_column_name();
+	}
+
+	/**
+	 * Gets the name of the primary column.
 	 *
 	 * @since 4.3.0
 	 * @access protected
@@ -844,12 +941,17 @@ class WP_List_Table {
 	 * @return string The name of the primary column.
 	 */
 	protected function get_primary_column_name() {
-		$columns = $this->get_columns();
+		$columns = get_column_headers( $this->screen );
 		$default = $this->get_default_primary_column_name();
 
+		// If the primary column doesn't exist fall back to the
+		// first non-checkbox column.
+		if ( ! isset( $columns[ $default ] ) ) {
+			$default = WP_List_Table::get_default_primary_column_name();
+		}
+
 		/**
-		 * Filter the name of the primary column for the current list table, with context
-		 * as argument (eg: 'plugins').
+		 * Filter the name of the primary column for the current list table.
 		 *
 		 * @since 4.3.0
 		 *
@@ -878,7 +980,7 @@ class WP_List_Table {
 		if ( isset( $this->_column_headers ) && is_array( $this->_column_headers ) ) {
 			// Back-compat for list tables that have been manually setting $_column_headers for horse reasons.
 			// In 4.3, we added a fourth argument for primary column.
-			$column_headers = array( array(), array(), array(), '' );
+			$column_headers = array( array(), array(), array(), $this->get_primary_column_name() );
 			foreach ( $this->_column_headers as $key => $value ) {
 				$column_headers[ $key ] = $value;
 			}
@@ -950,15 +1052,17 @@ class WP_List_Table {
 		$current_url = set_url_scheme( 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] );
 		$current_url = remove_query_arg( 'paged', $current_url );
 
-		if ( isset( $_GET['orderby'] ) )
+		if ( isset( $_GET['orderby'] ) ) {
 			$current_orderby = $_GET['orderby'];
-		else
+		} else {
 			$current_orderby = '';
+		}
 
-		if ( isset( $_GET['order'] ) && 'desc' == $_GET['order'] )
+		if ( isset( $_GET['order'] ) && 'desc' === $_GET['order'] ) {
 			$current_order = 'desc';
-		else
+		} else {
 			$current_order = 'asc';
+		}
 
 		if ( ! empty( $columns['cb'] ) ) {
 			static $cb_counter = 1;
@@ -974,7 +1078,7 @@ class WP_List_Table {
 				$class[] = 'hidden';
 			}
 
-			if ( 'cb' == $column_key )
+			if ( 'cb' === $column_key )
 				$class[] = 'check-column';
 			elseif ( in_array( $column_key, array( 'posts', 'comments', 'links' ) ) )
 				$class[] = 'num';
@@ -986,8 +1090,8 @@ class WP_List_Table {
 			if ( isset( $sortable[$column_key] ) ) {
 				list( $orderby, $desc_first ) = $sortable[$column_key];
 
-				if ( $current_orderby == $orderby ) {
-					$order = 'asc' == $current_order ? 'desc' : 'asc';
+				if ( $current_orderby === $orderby ) {
+					$order = 'asc' === $current_order ? 'desc' : 'asc';
 					$class[] = 'sorted';
 					$class[] = $current_order;
 				} else {
@@ -1020,6 +1124,8 @@ class WP_List_Table {
 		$singular = $this->_args['singular'];
 
 		$this->display_tablenav( 'top' );
+
+		$this->screen->render_screen_reader_content( 'heading_list' );
 ?>
 <table class="wp-list-table <?php echo implode( ' ', $this->get_table_classes() ); ?>">
 	<thead>
@@ -1066,15 +1172,17 @@ class WP_List_Table {
 	 * @param string $which
 	 */
 	protected function display_tablenav( $which ) {
-		if ( 'top' == $which )
+		if ( 'top' === $which ) {
 			wp_nonce_field( 'bulk-' . $this->_args['plural'] );
-?>
+		}
+		?>
 	<div class="tablenav <?php echo esc_attr( $which ); ?>">
 
+		<?php if ( $this->has_items() ): ?>
 		<div class="alignleft actions bulkactions">
 			<?php $this->bulk_actions( $which ); ?>
 		</div>
-<?php
+		<?php endif;
 		$this->extra_tablenav( $which );
 		$this->pagination( $which );
 ?>
@@ -1175,18 +1283,24 @@ class WP_List_Table {
 
 			$attributes = "class='$classes' $data";
 
-			if ( 'cb' == $column_name ) {
+			if ( 'cb' === $column_name ) {
 				echo '<th scope="row" class="check-column">';
 				echo $this->column_cb( $item );
 				echo '</th>';
-			}
-			elseif ( method_exists( $this, 'column_' . $column_name ) ) {
+			} elseif ( method_exists( $this, '_column_' . $column_name ) ) {
+				echo call_user_func(
+					array( $this, '_column_' . $column_name ),
+					$item,
+					$classes,
+					$data,
+					$primary
+				);
+			} elseif ( method_exists( $this, 'column_' . $column_name ) ) {
 				echo "<td $attributes>";
 				echo call_user_func( array( $this, 'column_' . $column_name ), $item );
 				echo $this->handle_row_actions( $item, $column_name, $primary );
 				echo "</td>";
-			}
-			else {
+			} else {
 				echo "<td $attributes>";
 				echo $this->column_default( $item, $column_name );
 				echo $this->handle_row_actions( $item, $column_name, $primary );
@@ -1196,7 +1310,7 @@ class WP_List_Table {
 	}
 
 	/**
-	 * Generate and display row actions links
+	 * Generates and display row actions links for the list table.
 	 *
 	 * @since 4.3.0
 	 * @access protected
@@ -1204,10 +1318,10 @@ class WP_List_Table {
 	 * @param object $item        The item being acted upon.
 	 * @param string $column_name Current column name.
 	 * @param string $primary     Primary column name.
-	 * @return string The row actions output. In this case, an empty string.
+	 * @return string The row actions HTML, or an empty string if the current column is the primary column.
 	 */
 	protected function handle_row_actions( $item, $column_name, $primary ) {
-		return '';
+		return $column_name === $primary ? '<button type="button" class="toggle-row"><span class="screen-reader-text">' . __( 'Show more details' ) . '</span></button>' : '';
  	}
 
 	/**

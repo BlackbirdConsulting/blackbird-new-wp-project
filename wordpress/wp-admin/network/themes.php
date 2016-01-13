@@ -53,7 +53,7 @@ if ( $action ) {
 				wp_safe_redirect( add_query_arg( 'error', 'none', $referer ) );
 				exit;
 			}
-			foreach( (array) $themes as $theme )
+			foreach ( (array) $themes as $theme )
 				$allowed_themes[ $theme ] = true;
 			update_site_option( 'allowedthemes', $allowed_themes );
 			wp_safe_redirect( add_query_arg( 'enabled', count( $themes ), $referer ) );
@@ -65,7 +65,7 @@ if ( $action ) {
 				wp_safe_redirect( add_query_arg( 'error', 'none', $referer ) );
 				exit;
 			}
-			foreach( (array) $themes as $theme )
+			foreach ( (array) $themes as $theme )
 				unset( $allowed_themes[ $theme ] );
 			update_site_option( 'allowedthemes', $allowed_themes );
 			wp_safe_redirect( add_query_arg( 'disabled', count( $themes ), $referer ) );
@@ -182,9 +182,9 @@ if ( $action ) {
 						wp_nonce_field( 'bulk-themes' );
 
 						if ( 1 == $themes_to_delete ) {
-							submit_button( __( 'Yes, Delete this theme' ), 'button', 'submit', false );
+							submit_button( __( 'Yes, delete this theme' ), 'button', 'submit', false );
 						} else {
-							submit_button( __( 'Yes, Delete these themes' ), 'button', 'submit', false );
+							submit_button( __( 'Yes, delete these themes' ), 'button', 'submit', false );
 						}
 					?>
 				</form>
@@ -192,7 +192,7 @@ if ( $action ) {
 				$referer = wp_get_referer();
 				?>
 				<form method="post" action="<?php echo $referer ? esc_url( $referer ) : ''; ?>" style="display:inline;">
-					<?php submit_button( __( 'No, Return me to the theme list' ), 'button', 'submit', false ); ?>
+					<?php submit_button( __( 'No, return me to the theme list' ), 'button', 'submit', false ); ?>
 				</form>
 
 				<p><a href="#" onclick="jQuery('#files-list').toggle(); return false;"><?php _e('Click to view entire list of files which will be deleted'); ?></a></p>
@@ -250,6 +250,12 @@ get_current_screen()->set_help_sidebar(
 	'<p>' . __('<a href="https://codex.wordpress.org/Network_Admin_Themes_Screen" target="_blank">Documentation on Network Themes</a>') . '</p>' .
 	'<p>' . __('<a href="https://wordpress.org/support/" target="_blank">Support Forums</a>') . '</p>'
 );
+
+get_current_screen()->set_screen_reader_content( array(
+	'heading_views'      => __( 'Filter themes list' ),
+	'heading_pagination' => __( 'Themes list navigation' ),
+	'heading_list'       => __( 'Themes list' ),
+) );
 
 $title = __('Themes');
 $parent_file = 'themes.php';

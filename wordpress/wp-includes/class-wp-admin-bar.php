@@ -1,11 +1,16 @@
 <?php
 /**
- * The WordPress Toolbar
- *
- * @since 3.1.0
+ * Toolbar API: WP_Admin_Bar class
  *
  * @package WordPress
  * @subpackage Toolbar
+ * @since 3.1.0
+ */
+
+/**
+ * Core class used to implement the Toolbar API.
+ *
+ * @since 3.1.0
  */
 class WP_Admin_Bar {
 	private $nodes = array();
@@ -556,7 +561,8 @@ class WP_Admin_Bar {
 		add_action( 'admin_bar_menu', 'wp_admin_bar_wp_menu', 10 );
 		add_action( 'admin_bar_menu', 'wp_admin_bar_my_sites_menu', 20 );
 		add_action( 'admin_bar_menu', 'wp_admin_bar_site_menu', 30 );
-		add_action( 'admin_bar_menu', 'wp_admin_bar_updates_menu', 40 );
+		add_action( 'admin_bar_menu', 'wp_admin_bar_customize_menu', 40 );
+		add_action( 'admin_bar_menu', 'wp_admin_bar_updates_menu', 50 );
 
 		// Content related.
 		if ( ! is_network_admin() && ! is_user_admin() ) {

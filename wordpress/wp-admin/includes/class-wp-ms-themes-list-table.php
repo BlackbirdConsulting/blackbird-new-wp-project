@@ -1,11 +1,19 @@
 <?php
 /**
- * MS Themes List Table class.
+ * List Table API: WP_MS_Themes_List_Table class
  *
  * @package WordPress
- * @subpackage List_Table
+ * @subpackage Administration
+ * @since 3.1.0
+ */
+
+/**
+ * Core class used to implement displaying themes in a list table for the network admin.
+ *
  * @since 3.1.0
  * @access private
+ *
+ * @see WP_List_Table
  */
 class WP_MS_Themes_List_Table extends WP_List_Table {
 
@@ -41,7 +49,7 @@ class WP_MS_Themes_List_Table extends WP_List_Table {
 
 		$page = $this->get_pagenum();
 
-		$this->is_site_themes = ( 'site-themes-network' == $this->screen->id ) ? true : false;
+		$this->is_site_themes = ( 'site-themes-network' === $this->screen->id ) ? true : false;
 
 		if ( $this->is_site_themes )
 			$this->site_id = isset( $_REQUEST['id'] ) ? intval( $_REQUEST['id'] ) : 0;
@@ -145,9 +153,10 @@ class WP_MS_Themes_List_Table extends WP_List_Table {
 			$orderby = ucfirst( $orderby );
 			$order = strtoupper( $order );
 
-			if ( $orderby == 'Name' ) {
-				if ( 'ASC' == $order )
+			if ( $orderby === 'Name' ) {
+				if ( 'ASC' === $order ) {
 					$this->items = array_reverse( $this->items );
+				}
 			} else {
 				uasort( $this->items, array( $this, '_order_callback' ) );
 			}
@@ -206,7 +215,7 @@ class WP_MS_Themes_List_Table extends WP_List_Table {
 		if ( $a == $b )
 			return 0;
 
-		if ( 'DESC' == $order )
+		if ( 'DESC' === $order )
 			return ( $a < $b ) ? 1 : -1;
 		else
 			return ( $a < $b ) ? -1 : 1;
@@ -216,10 +225,11 @@ class WP_MS_Themes_List_Table extends WP_List_Table {
 	 * @access public
 	 */
 	public function no_items() {
-		if ( ! $this->has_items )
+		if ( $this->has_items ) {
 			_e( 'No themes found.' );
-		else
+		} else {
 			_e( 'You do not appear to have any themes available at this time.' );
+		}
 	}
 
 	/**
@@ -245,7 +255,7 @@ class WP_MS_Themes_List_Table extends WP_List_Table {
 	}
 
 	/**
-	 * Get the name of the primary column.
+	 * Gets the name of the primary column.
 	 *
 	 * @since 4.3.0
 	 * @access protected
@@ -296,7 +306,7 @@ class WP_MS_Themes_List_Table extends WP_List_Table {
 			if ( 'search' != $type ) {
 				$status_links[$type] = sprintf( "<a href='%s' %s>%s</a>",
 					esc_url( add_query_arg('theme_status', $type, $url) ),
-					( $type == $status ) ? ' class="current"' : '',
+					( $type === $status ) ? ' class="current"' : '',
 					sprintf( $text, number_format_i18n( $count ) )
 				);
 			}
@@ -336,9 +346,12 @@ class WP_MS_Themes_List_Table extends WP_List_Table {
 	}
 
 	/**
-	 * @since 4.3.0
+	 * Handles the checkbox column output.
 	 *
-	 * @param WP_Theme $theme
+	 * @since 4.3.0
+	 * @access public
+	 *
+	 * @param WP_Theme $theme The current WP_Theme object.
 	 */
 	public function column_cb( $theme ) {
 		$checkbox_id = 'checkbox_' . md5( $theme->get('Name') );
@@ -349,13 +362,16 @@ class WP_MS_Themes_List_Table extends WP_List_Table {
 	}
 
 	/**
+	 * Handles the name column output.
+	 *
 	 * @since 4.3.0
+	 * @access public
 	 *
 	 * @global string $status
 	 * @global int    $page
 	 * @global string $s
 	 *
-	 * @param WP_Theme $theme
+	 * @param WP_Theme $theme The current WP_Theme object.
 	 */
 	public function column_name( $theme ) {
 		global $status, $page, $s;
@@ -440,18 +456,21 @@ class WP_MS_Themes_List_Table extends WP_List_Table {
 	}
 
 	/**
+	 * Handles the description column output.
+	 *
 	 * @since 4.3.0
+	 * @access public
 	 *
 	 * @global string $status
 	 * @global array  $totals
 	 *
-	 * @param WP_Theme $theme
+	 * @param WP_Theme $theme The current WP_Theme object.
 	 */
 	public function column_description( $theme ) {
 		global $status, $totals;
 		if ( $theme->errors() ) {
-			$pre = $status == 'broken' ? __( 'Broken Theme:' ) . ' ' : '';
-			echo '<p><strong class="attention">' . $pre . $theme->errors()->get_error_message() . '</strong></p>';
+			$pre = $status === 'broken' ? __( 'Broken Theme:' ) . ' ' : '';
+			echo '<p><strong class="error-message">' . $pre . $theme->errors()->get_error_message() . '</strong></p>';
 		}
 
 		if ( $this->is_site_themes ) {
@@ -498,13 +517,17 @@ class WP_MS_Themes_List_Table extends WP_List_Table {
 	}
 
 	/**
-	 * @since 4.3.0
+	 * Handles default column output.
 	 *
-	 * @param WP_Theme $theme
-	 * @param string   $column_name
+	 * @since 4.3.0
+	 * @access public
+	 *
+	 * @param WP_Theme $theme       The current WP_Theme object.
+	 * @param string   $column_name The current column name.
 	 */
 	public function column_default( $theme, $column_name ) {
 		$stylesheet = $theme->get_stylesheet();
+
 		/**
 		 * Fires inside each custom column of the Multisite themes list table.
 		 *
@@ -518,9 +541,12 @@ class WP_MS_Themes_List_Table extends WP_List_Table {
 	}
 
 	/**
-	 * @since 4.3.0
+	 * Handles the output for a single table row.
 	 *
-	 * @param WP_Theme $item
+	 * @since 4.3.0
+	 * @access public
+	 *
+	 * @param WP_Theme $item The current WP_Theme object.
 	 */
 	public function single_row_columns( $item ) {
 		list( $columns, $hidden, $sortable, $primary ) = $this->get_column_info();
