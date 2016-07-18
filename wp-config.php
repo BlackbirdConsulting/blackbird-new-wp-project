@@ -31,14 +31,14 @@ if ($_SERVER['REMOTE_ADDR']=='127.0.0.1') {
 
 // MySQL settings - You can get this info from your web host //
 if (WP_ENV == 'development') {
-    define('DB_NAME', 'bbwordpress');
+    define('DB_NAME', 'dev_database_name');
     define('DB_USER', 'root');
-    define('DB_PASSWORD', 'Herman826');
+    define('DB_PASSWORD', 'dev_database_password');
     define('DB_HOST', 'localhost');
 } else {
-    define('DB_NAME', 'blackbirdstaging_');
-    define('DB_USER', 'blackbirdstaging_blackbird');
-    define('DB_PASSWORD', '4,L#dGbov]gD');
+    define('DB_NAME', 'prod_database_name');
+    define('DB_USER', 'prod_database_user');
+    define('DB_PASSWORD', 'prod_database_pass');
     define('DB_HOST', 'localhost');
 } 
 

@@ -119,6 +119,9 @@ The ```wp-config.php``` file in this repository has been changed enable two data
 #Changelog
 Apple has a formalised version number structure based around the NumVersion struct, which specifies a one- or two-digit major version, a one-digit minor version, a one-digit "bug" (i.e. revision) version.
 
+##0.2.1
+- minor edit to wp-config. Created Private Branch for Blackbird user/pass, deleted from Master
+
 ##0.2.0
 - wp-sync-db removed. Add via GitHub-Updater from now on
 
