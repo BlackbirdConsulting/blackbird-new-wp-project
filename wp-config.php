@@ -36,9 +36,9 @@ if (WP_ENV == 'development') {
     define('DB_PASSWORD', 'Herman826');
     define('DB_HOST', 'localhost');
 } else {
-    define('DB_NAME', 'blackbm1_bbwordpress');
-    define('DB_USER', 'blackbm1_herm');
-    define('DB_PASSWORD', 'V1deEtin');
+    define('DB_NAME', 'blackbirdstaging_');
+    define('DB_USER', 'blackbirdstaging_blackbird');
+    define('DB_PASSWORD', '4,L#dGbov]gD');
     define('DB_HOST', 'localhost');
 } 
 
