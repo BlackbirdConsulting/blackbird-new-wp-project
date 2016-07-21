@@ -81,12 +81,12 @@ The ```wp-config.php``` file in this repository has been changed enable two data
 ###To clone this repository and include the submodules
 **Issue the following ```git``` command:**
 
-    blackbird@computer:~/htdocs$ git clone --recursive git@github.com:Herm71/bbwordpress.git yournewprojectdirectory
+    blackbird@computer:~/htdocs$ git clone git@github.com:BlackbirdConsulting/blackbird-new-wp-project.git yournewprojectdirectory
 
 ###To use this repository in a new project
 **First, clone this repository into a temporary new bare repository on your local machine, like this:**
 
-    blackbird@computer:~/htdocs$ git clone --bare --recursive git@github.com:Herm71/bbwordpress.git tempbbwordpress.git
+    blackbird@computer:~/htdocs$ git clone --bare git@github.com:BlackbirdConsulting/blackbird-new-wp-project.git tempbbwordpress.git
     # Make a bare clone of the repository
 
 **next, mirror this temporary clone to a new repository on your server**
@@ -105,7 +105,7 @@ The ```wp-config.php``` file in this repository has been changed enable two data
     blackbird@computer:~/htdocs$ rm -rf tempbbwordpress.git
     #remove temporary repository
 
-**Finally, create a new project directory on your development machine and clone the new repository into it:**
+**Create a new project directory on your development machine and clone the new repository into it:**
 
     blackbird@computer:~/htdocs$ mkdir newprojectdirectory
     # Create a new directory for your project
@@ -113,11 +113,60 @@ The ```wp-config.php``` file in this repository has been changed enable two data
     blackbird@computer:~/htdocs$ cd newprojectdirectory
     # Enter the newly created directory
 
-    blackbird@computer:~/htdocs/newprojectdirectory$ git clone --recursive https://github.com/exampleuser/new-repository.git
+    blackbird@computer:~/htdocs/newprojectdirectory$ git clone https://github.com/exampleuser/new-repository.git
     # Remember to use recursive to include all submodules
+
+**Re-clone WordPress**
+
+This repo has a reference to the GitHub WordPress repository. Once upon a time, I included this as a [git submodule](https://git-scm.com/docs/git-submodule), but this caused additional problems. My solution was simply to re-clone the GitHub WordPress repo. In your terminal, ```cd``` to your ```/newprojectdirectory```
+
+    blackbird@computer:~/htdocs$ cd newprojectdirectory
+    # CD to newprojectdirectory
+
+Next, remove the ```wordpress``` directory
+
+    blackbird@computer:~/htdocs/newprojectdirectory$ sudo rm -rf wordpress
+    # Remove the wordpress directory
+
+Finally, re-clone a fresh version of WordPress from [GitHub](https://github.com/WordPress/WordPress).
+
+    blackbird@computer:~/htdocs/newprojectdirectory$ git clone git@github.com:WordPress/WordPress.git wordpress
+    # Clone a fresh version of WordPress
+
+***Recommended: Switch to Stable Version***
+
+When you clone **WordPress**, the branch you pull down is a bleeding-edge Alpha version. You'll want to switch back to stable version. The folks at WordPress tag all their stable version, so you should switch to one of them. You can then feel free to via the WP Dashboard in the normal way.
+
+In your ```terminal``` change into your newly cloned ```wordpress``` directory:
+
+    blackbird@computer:~/htdocs/newprojectdirectory$cd wordpress
+    # Enter your newly cloned wordpress directory
+
+List all the tags:
+
+    blackbird@computer:~/htdocs/newprojectdirectory/wordpress$git tag -l
+    # List all the tags
+
+You'll get a list of all the tags 
+
+    ...
+    4.2
+    4.2.1
+    4.2.2
+    etc
+
+Checkout the latest tag:
+
+    blackbird@computer:~/htdocs/newprojectdirectory/wordpress$git checkout 4.2.2
+    # Check out the latest branch
+
 
 #Changelog
 Apple has a formalised version number structure based around the NumVersion struct, which specifies a one- or two-digit major version, a one-digit minor version, a one-digit "bug" (i.e. revision) version.
+
+##0.3.0
+- Moved from Personal to new Blackbird Project site on GitHub
+- Edited README to reflect.
 
 ##0.2.1
 - minor edit to wp-config. Created Private Branch for Blackbird user/pass, deleted from Master
